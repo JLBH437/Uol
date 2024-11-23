@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="reset.css">
+    <title>Uol chat</title>
+</head>
+<body>
+    <header>
+        <img src="images/uollogo.png" alt="Logo da Uol">
+        <ion-icon name="people"></ion-icon>
+    </header>
+    
+    <!-- Área de mensagens -->
+    <div class="messages">
+        <div class="message">
+            <span class="user">Usuário 1:</span>
+            <span class="text">Olá, tudo bem?</span>
+        </div>
+        <div class="message">
+            <span class="user">Usuário 2:</span>
+            <span class="text">Oi! Tudo ótimo, e você?</span>
+        </div>
+    </div>
+    
+    <footer>
+        <input type="text" placeholder="Escreva aqui...">
+        <ion-icon name="paper-plane-outline"></ion-icon>
+        <p>Enviando para Todos (público)</p>
+    </footer>
+    
+    <!-- Janela lateral -->
+    <div id="sidebar" class="hidden">
+        <div class="sidebar-header">
+            <p><strong>Escolha um contato para enviar mensagem:</strong></p>
+        </div>
+        <ul class="contacts">
+            <li class="contact selected">
+                <ion-icon name="people"></ion-icon>
+                Todos
+                <ion-icon class="check-icon" name="checkmark-outline"></ion-icon>
+            </li>
+            <li class="contact">
+                <ion-icon name="person-circle"></ion-icon>
+                Contato 1
+                <ion-icon class="check-icon" name="checkmark-outline"></ion-icon>
+            </li>
+            <li class="contact">
+                <ion-icon name="person-circle"></ion-icon>
+                Contato 2
+                <ion-icon class="check-icon" name="checkmark-outline"></ion-icon>
+            </li>
+            <li class="contact">
+                <ion-icon name="person-circle"></ion-icon>
+                Contato 3
+                <ion-icon class="check-icon" name="checkmark-outline"></ion-icon>
+            </li>
+        </ul>
+        <div class="visibility-options">
+            <p><strong>Escolha a visibilidade:</strong></p>
+            <div class="option">
+                <ion-icon name="lock-open"></ion-icon>
+                Público
+            </div>
+            <div class="option">
+                <ion-icon name="lock-closed"></ion-icon>
+                Reservadamente
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div id="overlay"></div>
+    
+    <script src="script.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</body>
+</html>
