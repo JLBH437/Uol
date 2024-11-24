@@ -10,6 +10,7 @@ const messagesContainer = document.querySelector(".messages");
 const sidebar = document.getElementById("sidebar");
 const openSidebarIcon = document.getElementById("open-sidebar");
 const closeSidebarButton = document.getElementById("close-sidebar");
+const sidebarExitButton = document.querySelector(".sidebar-option.exit"); // Botão "Sair" na sidebar
 
 // Função para pedir o nome do usuário
 async function promptUserName() {
@@ -139,6 +140,117 @@ closeSidebarButton.addEventListener("click", () => {
     }, 300); // Tempo da animação
 });
 
+// Função de Logout
+async function logout() {
+    try {
+        // Envia um pedido de desconexão
+        const response = await fetch(`https://mock-api.driven.com.br/api/v6/uol/status/${uuid}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name: userName }),
+        });
+
+        if (response.ok) {
+            alert(`Você foi desconectado, ${userName}.`);
+            // Redireciona para a tela inicial
+            window.location.reload(); // Recarrega a página (ou pode redirecionar para outra página)
+        } else {
+            alert("Erro ao tentar fazer logout. Tente novamente.");
+        }
+    } catch (error) {
+        alert(`Erro ao conectar ao servidor: ${error.message}`);
+    }
+}
+
+// Evento de logout no item "Sair" da sidebar
+sidebarExitButton.addEventListener("click", logout);
+
 // Inicia a aplicação
 promptUserName();
 fetchMessages(); // Carrega mensagens ao iniciar
+
+// Função para manter a conexão
+function keepConnection() {
+    fetch(`https://mock-api.driven.com.br/api/v6/uol/status/${uuid}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: userName }),
+    })
+        .then((response) => {
+            if (!response.ok) {
+                console.error("Erro ao manter conexão com o servidor.");
+            }
+        })
+        .catch((error) => {
+            console.error(`Erro ao conectar ao servidor: ${error.message}`);
+        });
+}
+
+// Configura a chamada de manter conexão a cada 5 segundos
+setInterval(keepConnection, 5000);
+
+// Elementos da Sidebar
+const sidebarUsersList = document.querySelector(".users-list");
+const allOption = document.querySelector(".sidebar-option");
+
+// Simula usuários online (a ser substituído por requisição ao servidor)
+const onlineUsers = [
+    "Maria",
+    "João",
+    "Carlos",
+    "Ana",
+];
+
+// Estado dos usuários selecionados
+let selectedUsers = ["Todos"];
+
+// Atualiza a lista de usuários online na sidebar
+function updateUserList() {
+    sidebarUsersList.innerHTML = ""; // Limpa a lista
+
+    onlineUsers.forEach((user) => {
+        const listItem = document.createElement("li");
+        listItem.innerHTML = `
+            <ion-icon name="person-circle"></ion-icon>
+            <span>${user}</span>
+            <ion-icon name="checkmark" class="checkmark-icon"></ion-icon>
+        `;
+
+        // Marca usuários já selecionados
+        if (selectedUsers.includes(user)) {
+            listItem.classList.add("selected");
+        }
+
+        // Adiciona evento de clique para selecionar/deselecionar
+        listItem.addEventListener("click", () => {
+            if (selectedUsers.includes(user)) {
+                selectedUsers = selectedUsers.filter((u) => u !== user); // Remove da seleção
+                listItem.classList.remove("selected");
+            } else {
+                selectedUsers.push(user); // Adiciona à seleção
+                listItem.classList.add("selected");
+            }
+        });
+
+        sidebarUsersList.appendChild(listItem);
+    });
+}
+
+// Atualiza a opção "Todos"
+allOption.addEventListener("click", () => {
+    if (selectedUsers.includes("Todos")) {
+        selectedUsers = selectedUsers.filter((u) => u !== "Todos");
+        allOption.classList.remove("selected");
+    } else {
+        selectedUsers = ["Todos"];
+        allOption.classList.add("selected");
+        updateUserList(); // Deseleciona os demais
+    }
+});
+
+// Inicializa a lista de usuários
+updateUserList();

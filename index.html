@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="reset.css">
-    <title>Uol chat</title>
+    <title>Uol Chat</title>
 </head>
 <body>
 
-    <header>
+<header>
     <img src="images/uollogo.png" alt="Logo da Uol">
     <ion-icon name="people" id="open-sidebar"></ion-icon>
 </header>
@@ -17,28 +17,45 @@
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
     <button id="close-sidebar">✖</button>
-    <h2>Configurações</h2>
-    <ul>
-        <li><a href="#">Perfil</a></li>
-        <li><a href="#">Configurações</a></li>
-        <li><a href="#">Sair</a></li>
-    </ul>
+    <div class="sidebar-content">
+        <!-- Título -->
+        <p class="sidebar-title">Escolha um contato para enviar mensagem:</p>
+        
+        <!-- Opção de todos -->
+        <div class="sidebar-option selected">
+            <ion-icon name="people"></ion-icon>
+            <span>Todos</span>
+            <ion-icon name="checkmark" class="checkmark-icon"></ion-icon>
+        </div>
+        
+        <!-- Lista de usuários online -->
+        <ul class="users-list"></ul>
+        
+        <!-- Opções adicionais -->
+        <ul class="sidebar-options">
+            <li><a href="#">Perfil</a></li>
+            <li><a href="#">Configurações</a></li>
+            <!-- "Sair" foi movido para a sidebar como item -->
+            <li class="sidebar-option exit" id="logout">
+                <ion-icon name="log-out"></ion-icon>
+                <span>Sair</span>
+            </li>
+        </ul>
+    </div>
 </div>
 
-    
-    <!-- Área de mensagens -->
-    <div class="messages">
-    </div>
-    
-    <footer>
-        <input type="text" placeholder="Escreva aqui...">
-        <ion-icon name="paper-plane-outline"></ion-icon>
-        <p>Enviando para Todos (público)</p>
-    </footer>
-    
-    
-    <script src="script.js"></script>
-    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+<!-- Área de mensagens -->
+<div class="messages">
+</div>
+
+<footer>
+    <input type="text" placeholder="Escreva aqui...">
+    <ion-icon name="paper-plane-outline"></ion-icon>
+    <p>Enviando para Todos (público)</p>
+</footer>
+
+<script src="script.js"></script>
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </body>
 </html>

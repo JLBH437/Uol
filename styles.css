@@ -64,6 +64,55 @@ header ion-icon {
     opacity: 0; /* Inicialmente transparente */
 }
 
+.sidebar-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.sidebar-option,
+.users-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
+
+.sidebar-option:hover,
+.users-list li:hover {
+    background-color: #f0f0f0;
+}
+
+.sidebar-option ion-icon:first-child,
+.users-list li ion-icon:first-child {
+    font-size: 24px;
+    margin-right: 10px;
+}
+
+.users-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.checkmark-icon {
+    visibility: hidden;
+    color: green;
+    font-size: 20px;
+}
+
+.users-list li .checkmark-icon,
+.sidebar-option .checkmark-icon {
+    margin-left: auto;
+}
+
+.users-list li.selected .checkmark-icon,
+.sidebar-option.selected .checkmark-icon {
+    visibility: visible;
+}
+
 /* Tornar visível e deslizante */
 .sidebar.show {
     right: 0; /* Move a sidebar para dentro da tela */
@@ -105,7 +154,27 @@ header ion-icon {
     color: #000000;
 }
 
+/* Novas opções de Sidebar */
+.sidebar-options {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
 
+.sidebar-options li {
+    margin: 10px 0;
+}
+
+.sidebar-options li a {
+    text-decoration: none;
+    color: #333333;
+    font-size: 16px;
+    transition: color 0.2s;
+}
+
+.sidebar-options li a:hover {
+    color: #000000;
+}
 
 /* Mensagens */
 .messages {
@@ -117,7 +186,6 @@ header ion-icon {
     flex-direction: column;
     gap: 8px; 
 }
-
 
 .message {
     background-color: #DCDCDC; 
@@ -184,7 +252,6 @@ footer input::placeholder {
     font-style: italic; 
     color: #000000; 
 }
-
 
 /* Para telas menores (320px a 480px) */
 @media (max-width: 480px) {
