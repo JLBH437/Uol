@@ -57,28 +57,24 @@ function getCurrentTime() {
 // Função para enviar mensagem
 async function sendMessage() {
     const messageText = inputField.value.trim();
-
     if (messageText === "") return;
 
     const messageObject = {
         from: userName,
-        to: "Todos",
+        to: selectedUsers.join(", "), // Envia para os usuários selecionados
         text: messageText,
-        type: "message", // "private_message" para mensagens privadas
+        type: messageVisibility === "Reservadamente" ? "private_message" : "message", // Define tipo de mensagem
     };
 
     try {
         const response = await fetch(messagesUrl, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(messageObject),
         });
 
         if (response.ok) {
-            // Exibe a mensagem localmente
-            displayMessage(messageObject);
+            displayMessage(messageObject); // Exibe mensagem localmente
             inputField.value = ""; // Limpa o campo de entrada
         } else {
             alert("Erro ao enviar a mensagem. Tente novamente.");
@@ -88,14 +84,44 @@ async function sendMessage() {
     }
 }
 
+
 // Função para exibir mensagens
+
 function displayMessage(message) {
     const messageElement = document.createElement("div");
     messageElement.classList.add("message");
+
+    // Verifica se é uma mensagem de "entrada" ou "saída"
+    const isStatusMessage = message.type === "status";
+
+    // Se for uma mensagem de status (entrada ou saída), aplica a cor desejada
+    if (isStatusMessage) {
+        messageElement.style.backgroundColor = "#DCDCDC"; // Cor para entrada/saída
+    } else {
+        // Se for uma mensagem privada, aplica o fundo rosa claro
+        const isPrivateMessage = message.type === "private_message";
+        if (isPrivateMessage) {
+            messageElement.style.backgroundColor = "#FFDEDE"; // Cor para mensagem privada
+        } else {
+            // Caso contrário, a mensagem é pública, então aplica o fundo branco
+            messageElement.style.backgroundColor = "#FFFFFF"; // Cor para mensagem pública normal
+        }
+    }
+
+    // Formatação do tempo, tipo de mensagem e destinatário
+    const time = getCurrentTime(); // Hora, minuto e segundo
+    const messageType = message.type === "private_message" ? "Reservadamente" : "Publicamente";
+    const toUsers = message.to === "Todos" ? "para Todos" : `para ${message.to}`;
+
+    // Monta a mensagem
     messageElement.innerHTML = `
-        <span class="message-time">${getCurrentTime()}</span>
-        <strong>${message.from}:</strong> ${message.text}
+        <span class="message-time">(${time})</span> 
+        <strong>${message.from}</strong> 
+        (${messageType}) 
+        ${toUsers}: ${message.text}
     `;
+
+    // Exibe a mensagem na tela
     messagesContainer.appendChild(messageElement);
     messagesContainer.scrollTop = messagesContainer.scrollHeight; // Scroll para a última mensagem
 }
@@ -209,6 +235,62 @@ const onlineUsers = [
 let selectedUsers = ["Todos"];
 
 // Atualiza a lista de usuários online na sidebar
+// Atualiza a lista de usuários online na sidebar
+function updateUserList(participants = []) {
+    sidebarUsersList.innerHTML = ""; // Limpa a lista
+
+    // Combine os usuários locais com os participantes da API
+    const allUsers = [...onlineUsers, ...participants.map(p => p.name)];
+
+    allUsers.forEach((user) => {
+        const listItem = document.createElement("li");
+        listItem.innerHTML = `
+            <ion-icon name="person-circle"></ion-icon>
+            <span>${user}</span>
+            <ion-icon name="checkmark" class="checkmark-icon"></ion-icon>
+        `;
+
+        // Marca usuários já selecionados
+        if (selectedUsers.includes(user)) {
+            listItem.classList.add("selected");
+        }
+
+        // Adiciona evento de clique para selecionar/deselecionar
+        listItem.addEventListener("click", () => {
+            if (selectedUsers.includes(user)) {
+                selectedUsers = selectedUsers.filter((u) => u !== user); // Remove da seleção
+                listItem.classList.remove("selected");
+            } else {
+                selectedUsers.push(user); // Adiciona à seleção
+                listItem.classList.add("selected");
+            }
+
+            // Atualiza o texto do footer com o nome do usuário selecionado
+            updateFooterMessageStatus();
+        });
+
+        sidebarUsersList.appendChild(listItem);
+    });
+}
+
+
+// Atualiza a opção "Todos"
+allOption.addEventListener("click", () => {
+    if (selectedUsers.includes("Todos")) {
+        selectedUsers = selectedUsers.filter((u) => u !== "Todos");
+        allOption.classList.remove("selected");
+    } else {
+        selectedUsers = ["Todos"];
+        allOption.classList.add("selected");
+        updateUserList(); // Deseleciona os demais
+    }
+
+    // Atualiza o status do footer
+    updateFooterMessageStatus();
+});
+
+
+// Atualiza a lista de usuários online na sidebar
 function updateUserList() {
     sidebarUsersList.innerHTML = ""; // Limpa a lista
 
@@ -234,23 +316,133 @@ function updateUserList() {
                 selectedUsers.push(user); // Adiciona à seleção
                 listItem.classList.add("selected");
             }
+
+            // Atualiza o texto do footer com o nome do usuário selecionado
+            updateFooterMessageStatus();
         });
 
         sidebarUsersList.appendChild(listItem);
     });
 }
 
-// Atualiza a opção "Todos"
-allOption.addEventListener("click", () => {
-    if (selectedUsers.includes("Todos")) {
-        selectedUsers = selectedUsers.filter((u) => u !== "Todos");
-        allOption.classList.remove("selected");
-    } else {
-        selectedUsers = ["Todos"];
-        allOption.classList.add("selected");
-        updateUserList(); // Deseleciona os demais
-    }
+// Estado inicial da visibilidade
+let messageVisibility = "Público"; // ou "Reservadamente"
+
+// Elementos do footer
+const messageStatusElement = document.getElementById("message-status");
+
+function updateFooterMessageStatus() {
+    let visibilityText = messageVisibility === "Público" ? "(público)" : "(reservadamente)";
+    let usersText = selectedUsers.length === 1 && selectedUsers[0] !== "Todos" ? selectedUsers[0] : selectedUsers.join(", ");
+
+    messageStatusElement.textContent = `Enviando para ${usersText} ${visibilityText}`;
+}
+
+// Atualiza o texto inicial do rodapé
+updateFooterMessageStatus();
+
+
+// Adicionar eventos para as opções de visibilidade
+const visibilityOptions = document.querySelectorAll(".visibility-option");
+visibilityOptions.forEach(option => {
+    option.addEventListener("click", () => {
+        // Remover seleção de todas as opções
+        visibilityOptions.forEach(opt => opt.classList.remove("selected"));
+
+        // Marcar a opção clicada como selecionada
+        option.classList.add("selected");
+
+        // Atualizar a visibilidade baseada na opção escolhida
+        messageVisibility = option.querySelector("span").textContent;
+
+        // Atualizar o texto no footer
+        updateFooterMessageStatus();
+    });
 });
 
-// Inicializa a lista de usuários
-updateUserList();
+// Atualizar o texto inicial do footer
+updateFooterMessageStatus();
+
+// Função para buscar participantes
+async function fetchParticipants() {
+    try {
+        const response = await fetch(`https://mock-api.driven.com.br/api/v6/uol/participants/${uuid}`);
+        if (response.ok) {
+            const participants = await response.json();
+            updateParticipantsList(participants);  // Atualiza a lista de participantes
+        } else {
+            console.error("Erro ao buscar participantes.");
+        }
+    } catch (error) {
+        console.error(`Erro ao conectar ao servidor: ${error.message}`);
+    }
+}
+
+// Função para atualizar a lista de participantes na sidebar
+function updateParticipantsList(participants) {
+    // Acessa a lista de usuários na sidebar
+    const sidebarUsersList = document.querySelector(".users-list");
+    sidebarUsersList.innerHTML = "";  // Limpa a lista atual
+
+    // Adiciona cada participante à lista
+    participants.forEach((participant) => {
+        const listItem = document.createElement("li");
+        listItem.innerHTML = `
+            <ion-icon name="person-circle"></ion-icon>
+            <span>${participant.name}</span>
+            <ion-icon name="checkmark" class="checkmark-icon"></ion-icon>
+        `;
+        
+        // Adiciona evento de clique para selecionar/deselecionar o participante
+        listItem.addEventListener("click", () => {
+            // Lógica para selecionar o participante, ou mudar a visibilidade da mensagem, etc.
+        });
+
+        sidebarUsersList.appendChild(listItem);  // Adiciona o participante à lista na sidebar
+    });
+}
+
+// Chama a função para buscar os participantes ao iniciar a página
+fetchParticipants();
+
+setInterval(fetchParticipants, 10000);  // Atualiza a lista de participantes a cada 10 segundos
+
+// Função para buscar participantes
+async function fetchParticipants() {
+    try {
+        const response = await fetch(`https://mock-api.driven.com.br/api/v6/uol/participants/${uuid}`);
+        if (response.ok) {
+            const participants = await response.json();
+            updateUserList(participants);  // Atualiza a lista de participantes
+        } else {
+            console.error("Erro ao buscar participantes.");
+        }
+    } catch (error) {
+        console.error(`Erro ao conectar ao servidor: ${error.message}`);
+    }
+}
+
+// Chama a função para buscar os participantes ao iniciar a página
+fetchParticipants();
+
+// Atualiza a lista de participantes a cada 10 segundos
+setInterval(fetchParticipants, 10000);
+
+// Adicionar eventos para as opções de visibilidade
+const visibilityOptions = document.querySelectorAll(".visibility-option");
+visibilityOptions.forEach(option => {
+    option.addEventListener("click", () => {
+        // Remover seleção de todas as opções
+        visibilityOptions.forEach(opt => opt.classList.remove("selected"));
+
+        // Marcar a opção clicada como selecionada
+        option.classList.add("selected");
+
+        // Atualizar a visibilidade baseada na opção escolhida
+        messageVisibility = option.querySelector("span").textContent;
+
+        // Atualizar o texto no footer
+        updateFooterMessageStatus();
+    });
+});
+

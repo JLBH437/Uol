@@ -22,7 +22,7 @@
         <p class="sidebar-title">Escolha um contato para enviar mensagem:</p>
         
         <!-- Opção de todos -->
-        <div class="sidebar-option selected">
+        <div class="sidebar-option selected" id="option-all">
             <ion-icon name="people"></ion-icon>
             <span>Todos</span>
             <ion-icon name="checkmark" class="checkmark-icon"></ion-icon>
@@ -30,11 +30,24 @@
         
         <!-- Lista de usuários online -->
         <ul class="users-list"></ul>
+
+        <!-- Nova seção de visibilidade -->
+        <p class="sidebar-title">Escolha a visibilidade:</p>
+        <div class="visibility-options">
+            <div class="visibility-option selected" id="visibility-public" data-visibility="public">
+                <ion-icon name="lock-open"></ion-icon>
+                <span>Público</span>
+                <ion-icon name="checkmark" class="checkmark-icon"></ion-icon>
+            </div>
+            <div class="visibility-option" id="visibility-private" data-visibility="private">
+                <ion-icon name="lock-closed"></ion-icon>
+                <span>Reservadamente</span>
+                <ion-icon name="checkmark" class="checkmark-icon"></ion-icon>
+            </div>
+        </div>
         
         <!-- Opções adicionais -->
         <ul class="sidebar-options">
-            <li><a href="#">Perfil</a></li>
-            <li><a href="#">Configurações</a></li>
             <!-- "Sair" foi movido para a sidebar como item -->
             <li class="sidebar-option exit" id="logout">
                 <ion-icon name="log-out"></ion-icon>
@@ -45,17 +58,18 @@
 </div>
 
 <!-- Área de mensagens -->
-<div class="messages">
-</div>
+<div class="messages"></div>
 
 <footer>
-    <input type="text" placeholder="Escreva aqui...">
-    <ion-icon name="paper-plane-outline"></ion-icon>
-    <p>Enviando para Todos (público)</p>
+    <input type="text" id="message-input" placeholder="Escreva aqui...">
+    <ion-icon name="paper-plane-outline" id="send-message"></ion-icon>
+    <p id="message-status">Enviando para Todos (público)</p>
 </footer>
 
+<!-- Scripts -->
 <script src="script.js"></script>
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
 </body>
 </html>

@@ -1,3 +1,4 @@
+
 /* Reset geral */
 body {
     margin: 0;
@@ -175,6 +176,42 @@ header ion-icon {
 .sidebar-options li a:hover {
     color: #000000;
 }
+
+/* Seção de visibilidade */
+.visibility-options {
+    margin-top: 20px; /* Distância da seção anterior */
+    padding-top: 10px; /* Espaço interno superior */
+    border-top: 1px solid #ddd; /* Linha separadora */
+}
+
+.visibility-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border-bottom: 1px solid #ddd; /* Linha separadora entre as opções */
+    cursor: pointer;
+}
+
+.visibility-option ion-icon:first-child {
+    font-size: 24px; /* Tamanho do ícone principal */
+    margin-right: 10px; /* Espaço entre o ícone e o texto */
+}
+
+.visibility-option .checkmark-icon {
+    visibility: hidden; /* Esconde o checkmark por padrão */
+    color: green; /* Cor do checkmark */
+    font-size: 20px;
+}
+
+.visibility-option.selected .checkmark-icon {
+    visibility: visible; /* Exibe o checkmark quando selecionado */
+}
+
+.visibility-option:hover {
+    background-color: #f0f0f0; /* Cor de fundo ao passar o mouse */
+}
+
 
 /* Mensagens */
 .messages {
