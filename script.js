@@ -59,6 +59,7 @@ async function sendMessage() {
     const messageText = inputField.value.trim();
     if (messageText === "") return;
 
+    // Verifique se a mensagem é privada e se o usuário selecionou destinatários
     const messageObject = {
         from: userName,
         to: selectedUsers.join(", "), // Envia para os usuários selecionados
@@ -101,7 +102,12 @@ function displayMessage(message) {
         // Se for uma mensagem privada, aplica o fundo rosa claro
         const isPrivateMessage = message.type === "private_message";
         if (isPrivateMessage) {
-            messageElement.style.backgroundColor = "#FFDEDE"; // Cor para mensagem privada
+            // Exibe a mensagem somente para o remetente e o destinatário
+            if (message.from === userName || selectedUsers.includes(message.from)) {
+                messageElement.style.backgroundColor = "#FFDEDE"; // Cor para mensagem privada
+            } else {
+                return; // Não exibe a mensagem se o usuário não for o remetente nem o destinatário
+            }
         } else {
             // Caso contrário, a mensagem é pública, então aplica o fundo branco
             messageElement.style.backgroundColor = "#FFFFFF"; // Cor para mensagem pública normal
@@ -125,6 +131,7 @@ function displayMessage(message) {
     messagesContainer.appendChild(messageElement);
     messagesContainer.scrollTop = messagesContainer.scrollHeight; // Scroll para a última mensagem
 }
+
 
 // Atualizar mensagens periodicamente
 async function fetchMessages() {
@@ -232,9 +239,8 @@ const onlineUsers = [
 ];
 
 // Estado dos usuários selecionados
-let selectedUsers = ["Todos"];
+let selectedUsers = ["Todos"];  // Inicializando com "Todos" já selecionado
 
-// Atualiza a lista de usuários online na sidebar
 // Atualiza a lista de usuários online na sidebar
 function updateUserList(participants = []) {
     sidebarUsersList.innerHTML = ""; // Limpa a lista
@@ -273,7 +279,6 @@ function updateUserList(participants = []) {
     });
 }
 
-
 // Atualiza a opção "Todos"
 allOption.addEventListener("click", () => {
     if (selectedUsers.includes("Todos")) {
@@ -289,12 +294,14 @@ allOption.addEventListener("click", () => {
     updateFooterMessageStatus();
 });
 
-
 // Atualiza a lista de usuários online na sidebar
-function updateUserList() {
+function updateUserList(participants = []) {
     sidebarUsersList.innerHTML = ""; // Limpa a lista
 
-    onlineUsers.forEach((user) => {
+    // Combine os usuários locais com os participantes da API
+    const allUsers = [...onlineUsers, ...participants.map(p => p.name)];
+
+    allUsers.forEach((user) => {
         const listItem = document.createElement("li");
         listItem.innerHTML = `
             <ion-icon name="person-circle"></ion-icon>
@@ -341,72 +348,6 @@ function updateFooterMessageStatus() {
 // Atualiza o texto inicial do rodapé
 updateFooterMessageStatus();
 
-
-// Adicionar eventos para as opções de visibilidade
-const visibilityOptions = document.querySelectorAll(".visibility-option");
-visibilityOptions.forEach(option => {
-    option.addEventListener("click", () => {
-        // Remover seleção de todas as opções
-        visibilityOptions.forEach(opt => opt.classList.remove("selected"));
-
-        // Marcar a opção clicada como selecionada
-        option.classList.add("selected");
-
-        // Atualizar a visibilidade baseada na opção escolhida
-        messageVisibility = option.querySelector("span").textContent;
-
-        // Atualizar o texto no footer
-        updateFooterMessageStatus();
-    });
-});
-
-// Atualizar o texto inicial do footer
-updateFooterMessageStatus();
-
-// Função para buscar participantes
-async function fetchParticipants() {
-    try {
-        const response = await fetch(`https://mock-api.driven.com.br/api/v6/uol/participants/${uuid}`);
-        if (response.ok) {
-            const participants = await response.json();
-            updateParticipantsList(participants);  // Atualiza a lista de participantes
-        } else {
-            console.error("Erro ao buscar participantes.");
-        }
-    } catch (error) {
-        console.error(`Erro ao conectar ao servidor: ${error.message}`);
-    }
-}
-
-// Função para atualizar a lista de participantes na sidebar
-function updateParticipantsList(participants) {
-    // Acessa a lista de usuários na sidebar
-    const sidebarUsersList = document.querySelector(".users-list");
-    sidebarUsersList.innerHTML = "";  // Limpa a lista atual
-
-    // Adiciona cada participante à lista
-    participants.forEach((participant) => {
-        const listItem = document.createElement("li");
-        listItem.innerHTML = `
-            <ion-icon name="person-circle"></ion-icon>
-            <span>${participant.name}</span>
-            <ion-icon name="checkmark" class="checkmark-icon"></ion-icon>
-        `;
-        
-        // Adiciona evento de clique para selecionar/deselecionar o participante
-        listItem.addEventListener("click", () => {
-            // Lógica para selecionar o participante, ou mudar a visibilidade da mensagem, etc.
-        });
-
-        sidebarUsersList.appendChild(listItem);  // Adiciona o participante à lista na sidebar
-    });
-}
-
-// Chama a função para buscar os participantes ao iniciar a página
-fetchParticipants();
-
-setInterval(fetchParticipants, 10000);  // Atualiza a lista de participantes a cada 10 segundos
-
 // Função para buscar participantes
 async function fetchParticipants() {
     try {
@@ -445,4 +386,3 @@ visibilityOptions.forEach(option => {
         updateFooterMessageStatus();
     });
 });
-
